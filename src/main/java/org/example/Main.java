@@ -3,10 +3,7 @@ package org.example;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -17,7 +14,11 @@ public class Main {
     public static void main(String[] args) {
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            manager = new Manager();
+            File data = new File("data.bin");
+            manager = Manager.loadFromBinFile(data);
+            if (manager == null) {
+                manager = new Manager();
+            }
             while (true) {
                 try (Socket clientSocket = serverSocket.accept();
                      BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -33,6 +34,7 @@ public class Main {
                                     .add("sum", manager.getMaxCategory().get().getValue()))
                             .build();
                     out.println(response);
+                    manager.saveBin(data, manager);
                 } catch (IOException e) {
                     System.out.println("Не могу стартовать сервер");
                     e.printStackTrace();

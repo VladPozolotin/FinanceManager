@@ -5,16 +5,16 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
-import java.io.FileReader;
-import java.io.IOException;
+
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class Manager {
+public class Manager implements Serializable{
     ArrayList<Purchase> spending = new ArrayList<>();
 
-    static class Purchase {
+    static class Purchase implements Serializable {
         private final String title;
         private final String category;
         private final long sum;
@@ -94,5 +94,24 @@ public class Manager {
         Optional<Map.Entry<String, Long>> maxCat = catSums.entrySet().stream()
                 .max((a, b) -> a.getValue().compareTo(b.getValue()));
         return maxCat;
+    }
+    public void saveBin(File file, Manager manager) {
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            ObjectOutputStream stream = new ObjectOutputStream(out);
+            stream.writeObject(manager);
+            stream.close();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+    public static Manager loadFromBinFile(File file) {
+        try (FileInputStream in = new FileInputStream(file)) {
+            ObjectInputStream stream = new ObjectInputStream(in);
+            Manager manager = (Manager) stream.readObject();
+            return manager;
+        } catch (IOException | ClassNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return null;
     }
 }
