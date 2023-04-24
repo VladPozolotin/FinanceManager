@@ -1,6 +1,10 @@
 package org.example;
 
-import java.io.BufferedReader;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
@@ -10,11 +14,15 @@ import java.util.*;
 public class Manager {
     ArrayList<Purchase> spending = new ArrayList<>();
 
-    class Purchase {
+    static class Purchase {
         private final String title;
         private final String category;
         private final long sum;
         private final Calendar date;
+
+        public Calendar getDate() {
+            return date;
+        }
 
         Purchase(String name, String cat, long price, Calendar parsedDate) {
             title = name;
@@ -29,6 +37,10 @@ public class Manager {
 
         protected long getSum() {
             return sum;
+        }
+
+        protected String getTitle() {
+            return title;
         }
     }
 
@@ -48,20 +60,20 @@ public class Manager {
     public static String getCatFromCSV(String name) {
         HashMap<String, String> purchases = new HashMap<>();
         try (FileReader csv = new FileReader("categories.tsv")) {
-            BufferedReader in = new BufferedReader(csv);
-            String inline;
-            while ((inline = in.readLine()) != null) {
-                String[] read = inline.split("\t");
-                String purchase = read[0].toLowerCase();
-                String category = read[1].toLowerCase();
+            CSVParser parser = new CSVParserBuilder().withSeparator('\t').build();
+            CSVReader csvReader = new CSVReaderBuilder(csv).withCSVParser(parser).build();
+            List<String[]> allData = csvReader.readAll();
+            for (String[] row : allData) {
+                String purchase = row[0];
+                String category = row[1];
                 if (!purchase.equals("") && !category.equals(""))
                     purchases.put(purchase, category);
             }
-        } catch (IOException ex) {
+        } catch (IOException | CsvException ex) {
             System.out.println(ex.getMessage());
         }
         String cat;
-        cat = purchases.get(name.toLowerCase());
+        cat = purchases.get(name);
         if (cat == null) {
             cat = "другое";
         }
