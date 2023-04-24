@@ -32,6 +32,15 @@ public class Main {
                             .add("maxCategory", Json.createObjectBuilder()
                                     .add("category", manager.getMaxCategory().get().getKey())
                                     .add("sum", manager.getMaxCategory().get().getValue()))
+                            .add("maxYearCategory", Json.createObjectBuilder()
+                                    .add("category", manager.getMaxYearCategory().get().getKey())
+                                    .add("sum", manager.getMaxYearCategory().get().getValue()))
+                            .add("maxMonthCategory", Json.createObjectBuilder()
+                                    .add("category", manager.getMaxMonthCategory().get().getKey())
+                                    .add("sum", manager.getMaxMonthCategory().get().getValue()))
+                            .add("maxDayCategory", Json.createObjectBuilder()
+                                    .add("category", manager.getMaxDayCategory().get().getKey())
+                                    .add("sum", manager.getMaxDayCategory().get().getValue()))
                             .build();
                     out.println(response);
                     manager.saveBin(data, manager);
