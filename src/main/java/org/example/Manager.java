@@ -9,22 +9,31 @@ import com.opencsv.exceptions.CsvException;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Manager implements Serializable{
     ArrayList<Purchase> spending = new ArrayList<>();
+
+    public LocalDate getLastRequestDate() {
+        return lastRequestDate;
+    }
+
+    LocalDate lastRequestDate;
 
     static class Purchase implements Serializable {
         private final String title;
         private final String category;
         private final long sum;
-        private final Calendar date;
+        private final LocalDate date;
 
-        public Calendar getDate() {
+        public LocalDate getDate() {
             return date;
         }
 
-        Purchase(String name, String cat, long price, Calendar parsedDate) {
+        Purchase(String name, String cat, long price, LocalDate parsedDate) {
             title = name;
             category = cat;
             sum = price;
@@ -46,15 +55,10 @@ public class Manager implements Serializable{
 
     public void addPurchase(String name, String date, long sum) {
         String category = getCatFromCSV(name);
-        Calendar parsedDate = Calendar.getInstance();
-        SimpleDateFormat parser = new SimpleDateFormat("yyyy.MM.dd");
-        try {
-            parsedDate.setTime(parser.parse(date));
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
         Purchase purchase = new Purchase(name, category, sum, parsedDate);
         spending.add(purchase);
+        lastRequestDate = parsedDate;
     }
 
     public static String getCatFromCSV(String name) {
@@ -83,6 +87,61 @@ public class Manager implements Serializable{
     public Optional<Map.Entry<String, Long>> getMaxCategory() {
         HashMap<String, Long> catSums = new HashMap<>();
         for (Purchase purchase : spending) {
+            String cat = purchase.getCategory();
+            if (!catSums.containsKey(cat)) {
+                catSums.put(cat, purchase.getSum());
+            } else {
+                Long old = catSums.get(cat);
+                catSums.put(cat, (old + purchase.getSum()));
+            }
+        }
+        Optional<Map.Entry<String, Long>> maxCat = catSums.entrySet().stream()
+                .max((a, b) -> a.getValue().compareTo(b.getValue()));
+        return maxCat;
+    }
+    public Optional<Map.Entry<String, Long>> getMaxYearCategory() {
+        List<Purchase> spendingForYear = spending.stream()
+                .filter(p -> p.getDate().getYear() == (getLastRequestDate().getYear()))
+                .collect(Collectors.toList());
+        HashMap<String, Long> catSums = new HashMap<>();
+        for (Purchase purchase : spendingForYear) {
+            String cat = purchase.getCategory();
+            if (!catSums.containsKey(cat)) {
+                catSums.put(cat, purchase.getSum());
+            } else {
+                Long old = catSums.get(cat);
+                catSums.put(cat, (old + purchase.getSum()));
+            }
+        }
+        Optional<Map.Entry<String, Long>> maxCat = catSums.entrySet().stream()
+                .max((a, b) -> a.getValue().compareTo(b.getValue()));
+        return maxCat;
+    }
+    public Optional<Map.Entry<String, Long>> getMaxMonthCategory() {
+        List<Purchase> spendingForMonth = spending.stream()
+                .filter(p -> p.getDate().getYear() == (getLastRequestDate().getYear()))
+                .filter(p -> p.getDate().getMonth() == (getLastRequestDate().getMonth()))
+                .collect(Collectors.toList());
+        HashMap<String, Long> catSums = new HashMap<>();
+        for (Purchase purchase : spendingForMonth) {
+            String cat = purchase.getCategory();
+            if (!catSums.containsKey(cat)) {
+                catSums.put(cat, purchase.getSum());
+            } else {
+                Long old = catSums.get(cat);
+                catSums.put(cat, (old + purchase.getSum()));
+            }
+        }
+        Optional<Map.Entry<String, Long>> maxCat = catSums.entrySet().stream()
+                .max((a, b) -> a.getValue().compareTo(b.getValue()));
+        return maxCat;
+    }
+    public Optional<Map.Entry<String, Long>> getMaxDayCategory() {
+        List<Purchase> spendingForDay = spending.stream()
+                .filter(p -> p.getDate().isEqual(getLastRequestDate()))
+                .collect(Collectors.toList());
+        HashMap<String, Long> catSums = new HashMap<>();
+        for (Purchase purchase : spendingForDay) {
             String cat = purchase.getCategory();
             if (!catSums.containsKey(cat)) {
                 catSums.put(cat, purchase.getSum());

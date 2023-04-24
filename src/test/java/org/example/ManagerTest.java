@@ -7,10 +7,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,29 +20,15 @@ class ManagerTest {
 
     @BeforeAll
     static void beforeAll(){
-        SimpleDateFormat parser = new SimpleDateFormat("yyyy.MM.dd");
-        Calendar date1 = Calendar.getInstance();
-        Calendar date2 = Calendar.getInstance();
-        Calendar date3 = Calendar.getInstance();
-        Calendar date4 = Calendar.getInstance();
-        Calendar date5 = Calendar.getInstance();
-        Calendar date6 = Calendar.getInstance();
-        Calendar date7 = Calendar.getInstance();
-        Calendar date8 = Calendar.getInstance();
-        Calendar date9 = Calendar.getInstance();
-        try {
-            date1.setTime(parser.parse("2022.08.02"));
-            date2.setTime(parser.parse("2023.01.15"));
-            date3.setTime(parser.parse("2021.03.31"));
-            date4.setTime(parser.parse("2023.02.24"));
-            date5.setTime(parser.parse("2022.08.02"));
-            date6.setTime(parser.parse("2022.09.17"));
-            date7.setTime(parser.parse("2022.12.12"));
-            date8.setTime(parser.parse("2022.02.24"));
-            date9.setTime(parser.parse("2023.04.24"));
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        LocalDate date1 = LocalDate.parse("2022.08.02", DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        LocalDate date2 = LocalDate.parse("2023.01.15", DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        LocalDate date3 = LocalDate.parse("2021.03.31", DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        LocalDate date4 = LocalDate.parse("2023.02.24", DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        LocalDate date5 = LocalDate.parse("2022.08.02", DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        LocalDate date6 = LocalDate.parse("2022.09.17", DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        LocalDate date7 = LocalDate.parse("2022.12.12", DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        LocalDate date8 = LocalDate.parse("2022.02.24", DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        LocalDate date9 = LocalDate.parse("2023.04.24", DateTimeFormatter.ofPattern("yyyy.MM.dd"));
         Manager.Purchase purchase1 = new Manager.Purchase("булка", "еда", 200, date1);
         Manager.Purchase purchase2 = new Manager.Purchase("колбаса", "еда", 300, date2);
         Manager.Purchase purchase3 = new Manager.Purchase("сухарики", "еда", 20, date3);
