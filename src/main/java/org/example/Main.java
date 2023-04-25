@@ -15,8 +15,9 @@ public class Main {
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             File data = new File("data.bin");
-            manager = Manager.loadFromBinFile(data);
-            if (manager == null) {
+            try {
+                manager = Manager.loadFromBinFile(data);
+            } catch (IOException e) {
                 manager = new Manager();
             }
             while (true) {
