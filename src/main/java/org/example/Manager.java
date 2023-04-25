@@ -163,12 +163,12 @@ public class Manager implements Serializable{
             System.out.println(ex.getMessage());
         }
     }
-    public static Manager loadFromBinFile(File file) {
+    public static Manager loadFromBinFile(File file) throws IOException {
         try (FileInputStream in = new FileInputStream(file)) {
             ObjectInputStream stream = new ObjectInputStream(in);
             Manager manager = (Manager) stream.readObject();
             return manager;
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
         return null;
